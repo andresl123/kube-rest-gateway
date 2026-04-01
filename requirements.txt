@@ -1,0 +1,15 @@
+# kube-rest-gateway dependencies
+# Install with: pip install -r requirements.txt
+
+# Web framework & ASGI server
+fastapi>=0.111.0
+uvicorn[standard]>=0.29.0
+
+# Kubernetes official Python client
+kubernetes>=29.0.0
+
+# Environment variables
+python-dotenv>=1.0.1
+
+# Typing extras (needed for Python < 3.11 compat)
+typing_extensions>=4.11.0
