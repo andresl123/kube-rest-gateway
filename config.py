@@ -30,7 +30,7 @@ API_TOKEN: str = os.environ.get("GATEWAY_API_TOKEN", "")
 # The host interface and port the server listens on.
 # 0.0.0.0 is required when running inside a container; use 127.0.0.1 locally.
 HOST: str = os.environ.get("GATEWAY_HOST", "127.0.0.1")
-PORT: int = int(os.environ.get("GATEWAY_PORT", "8080"))
+PORT: int = int(os.environ.get("GATEWAY_PORT", "8081"))
 
 # ── Logging ──────────────────────────────────────────────────────────────────
 LOG_LEVEL: str = os.environ.get("LOG_LEVEL", "INFO").upper()
