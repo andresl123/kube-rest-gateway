@@ -4,7 +4,7 @@ main.py — kube-rest-gateway
 A lightweight FastAPI server that acts as a secure proxy between an AI agent
 and a Kubernetes cluster.  The agent cannot reach the K8s API directly
 (port 6443 is blocked in its sandbox), so it talks to this gateway on an
-allowed port (default 8080).
+allowed port (default 8081).
 
 Endpoints
 ---------
