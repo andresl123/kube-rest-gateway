@@ -277,6 +277,81 @@ async def healthz() -> Dict[str, str]:
     return {"status": "ok", "service": "kube-rest-gateway"}
 
 
+@app.get("/", tags=["Health"])
+async def root() -> Dict[str, str]:
+    """Root redirect to help."""
+    return {
+        "message": "Welcome to Kube-REST-Gateway. Use /api/help for instructions.",
+        "docs": "/docs",
+        "help": "/api/help",
+    }
+
+
+@app.get("/api/help", tags=["Health"], dependencies=[Depends(verify_token)])
+async def api_help() -> Dict[str, Any]:
+    """
+    Returns a structured guide for the AI agent to understand
+    how to interact with this cluster.
+    """
+    return {
+        "gateway_info": {
+            "version": "1.0.0",
+            "purpose": "Secure Kubernetes API proxy for AI Agents",
+            "auth": "Bearer Token required in 'Authorization' header",
+        },
+        "capabilities": [
+            {
+                "endpoint": "/api/pods",
+                "method": "GET",
+                "description": "List all pods. Use ?namespace= to filter.",
+                "examples": ["/api/pods?namespace=default", "/api/pods?label_selector=app=nginx"],
+            },
+            {
+                "endpoint": "/api/pods/{name}",
+                "method": "GET",
+                "description": "Get detailed JSON for a specific pod.",
+            },
+            {
+                "endpoint": "/api/logs/{name}",
+                "method": "GET",
+                "description": "Fetch recent logs. Use ?tail_lines= to limit output.",
+                "params": ["namespace", "container", "tail_lines", "previous"],
+            },
+            {
+                "endpoint": "/api/services",
+                "method": "GET",
+                "description": "List all services in a namespace.",
+            },
+            {
+                "endpoint": "/api/deployments",
+                "method": "GET",
+                "description": "List deployments and checkout replica health.",
+            },
+            {
+                "endpoint": "/api/events",
+                "method": "GET",
+                "description": "Get cluster events to debug crashing pods (ImagePullBackOff, etc).",
+                "params": ["namespace", "field_selector"],
+            },
+            {
+                "endpoint": "/api/namespaces",
+                "method": "GET",
+                "description": "List all available namespaces in the cluster.",
+            },
+            {
+                "endpoint": "/api/nodes",
+                "method": "GET",
+                "description": "List physical/virtual nodes in the cluster.",
+            },
+        ],
+        "instructions": (
+            "1. Always check /api/namespaces first if you aren't sure where to look. "
+            "2. If a pod is 'Pending' or 'Error', check /api/events for the root cause. "
+            "3. Keep log requests small (e.g., tail_lines=50) to save processing time."
+        ),
+    }
+
+
 # ── Pods ──────────────────────────────────────────────────────────────────────
 
 
