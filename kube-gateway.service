@@ -4,14 +4,14 @@ After=network.target
 
 [Service]
 # Replace 'ubuntu' with your actual username
-User=ubuntu
-Group=ubuntu
+User=andre
+Group=andre
 
 # Replace with the actual path to your project folder
-WorkingDirectory=/home/sandbox/kube-rest-gateway
+WorkingDirectory=/home/andre/kube-rest-gateway
 
 # Path to the python executable inside your virtual environment
-ExecStart=/home/ubuntu/kube-rest-gateway/.venv/bin/python main.py
+ExecStart=/home/andre/kube-rest-gateway/.venv/bin/python main.py
 
 # Restart the service automatically if it crashes
 Restart=always
