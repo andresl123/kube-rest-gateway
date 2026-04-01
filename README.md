@@ -45,7 +45,7 @@ All settings are read from **environment variables** — no secrets in source co
 |---|---|---|
 | `KUBECONFIG_PATH` | `~/.kube/config` | Path to your kubeconfig file |
 | `GATEWAY_API_TOKEN` | *(empty — auth disabled)* | Shared bearer token the agent must send |
-| `GATEWAY_HOST` | `127.0.0.1` | Interface to bind (use `0.0.0.0` in containers) |
+| `GATEWAY_HOST` | `0.0.0.0` | Interface to bind (`0.0.0.0` allows external access) |
 | `GATEWAY_PORT` | `8081` | Listening port |
 | `DEFAULT_NAMESPACE` | `default` | Namespace used when none is specified |
 | `DEFAULT_LOG_TAIL_LINES` | `100` | Lines returned by `/api/logs/…` by default |
@@ -82,11 +82,11 @@ You should see:
 ```
 INFO  kube-gateway — Kubernetes client initialised from: C:\Users\Admin\.kube\restricted-user.yaml
 INFO  uvicorn.error — Application startup complete.
-INFO  uvicorn.error — Uvicorn running on http://127.0.0.1:8081
+INFO  uvicorn.error — Uvicorn running on http://YOUR_SERVER_IP:8081
 ```
 
 The **interactive docs** (Swagger UI) are available at:
-`http://127.0.0.1:8081/docs`
+`http://YOUR_SERVER_IP:8081/docs`
 
 ---
 
@@ -151,55 +151,55 @@ List recent events — great for diagnosing pod failures.
 
 ```bash
 # ── Liveness probe (no auth needed) ──────────────────────────────────────────
-curl http://127.0.0.1:8081/healthz
+curl http://YOUR_SERVER_IP:8081/healthz
 
 # ── List pods in the default namespace ───────────────────────────────────────
 curl -H "Authorization: Bearer YOUR_TOKEN" \
-     http://127.0.0.1:8081/api/pods
+     http://YOUR_SERVER_IP:8081/api/pods
 
 # ── List pods in a specific namespace ────────────────────────────────────────
 curl -H "Authorization: Bearer YOUR_TOKEN" \
-     "http://127.0.0.1:8081/api/pods?namespace=kube-system"
+     "http://YOUR_SERVER_IP:8081/api/pods?namespace=kube-system"
 
 # ── Filter pods by label ─────────────────────────────────────────────────────
 curl -H "Authorization: Bearer YOUR_TOKEN" \
-     "http://127.0.0.1:8081/api/pods?label_selector=app%3Dnginx"
+     "http://YOUR_SERVER_IP:8081/api/pods?label_selector=app%3Dnginx"
 
 # ── Describe a single pod ─────────────────────────────────────────────────────
 curl -H "Authorization: Bearer YOUR_TOKEN" \
-     http://127.0.0.1:8081/api/pods/my-pod-7d9f8b-xkqzp
+     http://YOUR_SERVER_IP:8081/api/pods/my-pod-7d9f8b-xkqzp
 
 # ── Fetch the last 50 log lines from a pod ───────────────────────────────────
 curl -H "Authorization: Bearer YOUR_TOKEN" \
-     "http://127.0.0.1:8081/api/logs/my-pod-7d9f8b-xkqzp?tail_lines=50"
+     "http://YOUR_SERVER_IP:8081/api/logs/my-pod-7d9f8b-xkqzp?tail_lines=50"
 
 # ── Logs for a specific container in a multi-container pod ───────────────────
 curl -H "Authorization: Bearer YOUR_TOKEN" \
-     "http://127.0.0.1:8081/api/logs/my-pod-7d9f8b-xkqzp?container=sidecar&tail_lines=200"
+     "http://YOUR_SERVER_IP:8081/api/logs/my-pod-7d9f8b-xkqzp?container=sidecar&tail_lines=200"
 
 # ── List services ─────────────────────────────────────────────────────────────
 curl -H "Authorization: Bearer YOUR_TOKEN" \
-     http://127.0.0.1:8081/api/services
+     http://YOUR_SERVER_IP:8081/api/services
 
 # ── List deployments ──────────────────────────────────────────────────────────
 curl -H "Authorization: Bearer YOUR_TOKEN" \
-     http://127.0.0.1:8081/api/deployments
+     http://YOUR_SERVER_IP:8081/api/deployments
 
 # ── List nodes ────────────────────────────────────────────────────────────────
 curl -H "Authorization: Bearer YOUR_TOKEN" \
-     http://127.0.0.1:8081/api/nodes
+     http://YOUR_SERVER_IP:8081/api/nodes
 
 # ── List namespaces ───────────────────────────────────────────────────────────
 curl -H "Authorization: Bearer YOUR_TOKEN" \
-     http://127.0.0.1:8081/api/namespaces
+     http://YOUR_SERVER_IP:8081/api/namespaces
 
 # ── Events for a specific pod ─────────────────────────────────────────────────
 curl -H "Authorization: Bearer YOUR_TOKEN" \
-     "http://127.0.0.1:8081/api/events?field_selector=involvedObject.name%3Dmy-pod-7d9f8b-xkqzp"
+     "http://YOUR_SERVER_IP:8081/api/events?field_selector=involvedObject.name%3Dmy-pod-7d9f8b-xkqzp"
 
 # ── Verify auth rejection (expect 401) ───────────────────────────────────────
 curl -H "Authorization: Bearer wrong-token" \
-     http://127.0.0.1:8081/api/pods
+     http://YOUR_SERVER_IP:8081/api/pods
 ```
 
 ---
@@ -234,7 +234,6 @@ All errors are returned as structured JSON so the AI agent can parse them:
   permissions the agent actually needs (ideally `get`/`list`/`watch` on specific
   resources only).
 - Set `GATEWAY_API_TOKEN` to a long random string. Rotate it if compromised.
-- Bind the server to `127.0.0.1` (default) so it is not reachable from the
-  network — the agent communicates over loopback only.
+- Bind the server to your desired interface (`0.0.0.0` for all network access).
 - The `/healthz` endpoint intentionally skips auth so orchestration tools
   (Docker health-check, Kubernetes liveness probe) can use it without a token.
